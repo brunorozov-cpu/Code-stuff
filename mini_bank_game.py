@@ -1,7 +1,6 @@
 #from import kaka siin, ALALALALA!
 from turtle import *
 from random import randint
-
 # Ruut taust
 side = 600
 penup()
@@ -78,6 +77,22 @@ if soovitud_raha <= konto:
     konto -= soovitud_raha
     kiri(f"Võtsite {soovitud_raha} € välja!", -160)
     kiri(f"Alles on {konto} €.", -190)
+
+    raha = textinput("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
+
+    if raha == "jah":
+        screen = getscreen()
+        screen.addshape("raha.gif")
+        p = Turtle()
+        p.shape("raha.gif")
+        p.resizemode("user")
+        p.shapesize(0.5, 0.5)
+        p.penup()
+        p.goto(0, 0)
+    else:
+        konto_tekst.clear()
+        kiri("Olgu, ma jätan endale siis")
+
 else:
     kiri("Kontol on liiga vähe raha!", -160)
     casino = textinput("Kasiino", "Kas soovite teenida raha juurde? (jah/ei)")
@@ -92,8 +107,17 @@ else:
         suvaline_arv = randint(1, 2)
         if kasutaja_valik == suvaline_arv:
             konto += 100
-            kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja 100€!", -190)
-            kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -220)
+            kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja 100€!", 20)
+            kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -20)
+            screen = getscreen()
+            screen.addshape("lel.gif")
+            p = Turtle()
+            p.shape("lel.gif")
+            p.resizemode("user")
+            p.shapesize(0.5, 0.5)
+            p.penup()
+            p.goto(0, 0)
+           
         else:
             konto = 0
             kiri("Sa kaotasid kogu oma raha :(", 20)
@@ -104,7 +128,7 @@ else:
             p.resizemode("user")
             p.shapesize(0.5, 0.5)
             p.penup()
-            p.goto(0, -250)
+            p.goto(0, 0)
     else:
         kiri("Ole vaene rott edasi siis...", -190)
 
