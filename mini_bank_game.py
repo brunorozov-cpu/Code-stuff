@@ -1,6 +1,8 @@
 #from import kaka siin, ALALALALA!
 from turtle import *
 from random import randint
+from tkinter import messagebox
+
 # Ruut taust
 side = 600
 penup()
@@ -78,7 +80,7 @@ if soovitud_raha <= konto:
     kiri(f"Võtsite {soovitud_raha} € välja!", -160)
     kiri(f"Alles on {konto} €.", -190)
 
-    raha = textinput("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
+    raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
 
     if raha == "jah":
         screen = getscreen()
@@ -94,9 +96,11 @@ if soovitud_raha <= konto:
         kiri("Olgu, ma jätan endale siis")
 
 else:
-    kiri("Kontol on liiga vähe raha!", -160)
-    casino = textinput("Kasiino", "Kas soovite teenida raha juurde? (jah/ei)")
-    if casino and casino.lower() == "jah":
+    kiri("Kontol on liiga vähe raha!", -130)
+
+    casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
+
+    if casino:
         kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
         konto_tekst.clear()
         try:
@@ -117,7 +121,6 @@ else:
             p.shapesize(0.5, 0.5)
             p.penup()
             p.goto(0, 0)
-           
         else:
             konto = 0
             kiri("Sa kaotasid kogu oma raha :(", 20)
@@ -130,6 +133,6 @@ else:
             p.penup()
             p.goto(0, 0)
     else:
-        kiri("Ole vaene rott edasi siis...", -190)
+        kiri("Ole vaene rott edasi siis...", -160)
 
 exitonclick()
