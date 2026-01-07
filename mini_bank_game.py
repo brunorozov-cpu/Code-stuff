@@ -7,17 +7,14 @@ from time import sleep
 #Roulette table
 def display_animation_casino():
     tracer(0)
-
     laud = Turtle()
     laud.hideturtle()
     laud.speed(0)
-
     nool = Turtle()
     nool.hideturtle()
     nool.speed(0)
     nool.color("white")
     nool.width(4)
-
     sektorid = 12
     raadius = 120
     nurk = 360 / sektorid
@@ -30,16 +27,13 @@ def display_animation_casino():
             laud.penup()
             laud.goto(0, 0)
             laud.setheading(pööre + i * nurk)
-
             laud.fillcolor(värvid[i])
             laud.begin_fill()
-
             laud.forward(raadius)
             laud.left(90)
             laud.circle(raadius, nurk)
             laud.left(90)
             laud.goto(0, 0)
-
             laud.end_fill()
 
     def joonista_nool():
@@ -48,7 +42,7 @@ def display_animation_casino():
         nool.goto(0, raadius + 10)
         nool.pendown()
         nool.goto(0, raadius + 40)
-
+        
     pööre = 0
     kiirus = 30
 
@@ -196,3 +190,4 @@ else:
         kiri("Ole vaene rott edasi siis...", -160)
 
 exitonclick()
+
