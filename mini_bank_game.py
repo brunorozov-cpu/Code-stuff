@@ -2,6 +2,65 @@
 from turtle import *
 from random import randint
 from tkinter import messagebox
+from time import sleep
+
+#Roulette table
+def display_animation_casino():
+    tracer(0)
+
+    laud = Turtle()
+    laud.hideturtle()
+    laud.speed(0)
+
+    nool = Turtle()
+    nool.hideturtle()
+    nool.speed(0)
+    nool.color("white")
+    nool.width(4)
+
+    sektorid = 12
+    raadius = 120
+    nurk = 360 / sektorid
+    värvid = ["red", "black"] * (sektorid // 2)
+
+    def joonista_rulet(pööre):
+        laud.clear()
+
+        for i in range(sektorid):
+            laud.penup()
+            laud.goto(0, 0)
+            laud.setheading(pööre + i * nurk)
+
+            laud.fillcolor(värvid[i])
+            laud.begin_fill()
+
+            laud.forward(raadius)
+            laud.left(90)
+            laud.circle(raadius, nurk)
+            laud.left(90)
+            laud.goto(0, 0)
+
+            laud.end_fill()
+
+    def joonista_nool():
+        nool.clear()
+        nool.penup()
+        nool.goto(0, raadius + 10)
+        nool.pendown()
+        nool.goto(0, raadius + 40)
+
+    pööre = 0
+    kiirus = 30
+
+    for _ in range(40):
+        pööre += kiirus
+        joonista_rulet(pööre)
+        joonista_nool()
+        update()
+        sleep(0.05)
+        kiirus *= 0.93
+
+    tracer(1)
 
 # Ruut taust
 side = 600
@@ -82,7 +141,7 @@ if soovitud_raha <= konto:
 
     raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
 
-    if raha == "jah":
+    if (raha):
         screen = getscreen()
         screen.addshape("raha.gif")
         p = Turtle()
@@ -105,6 +164,7 @@ else:
         konto_tekst.clear()
         try:
             kasutaja_valik = int(kasutaja_valik)
+            display_animation_casino()
         except:
             kiri("Vale sisestus!", -190)
             exitonclick()
