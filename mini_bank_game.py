@@ -3,6 +3,8 @@ from turtle import *
 from random import randint
 from tkinter import messagebox
 from time import sleep
+import sys
+import time
 
 #Roulette table
 def display_animation_casino():
@@ -44,7 +46,7 @@ def display_animation_casino():
         nool.goto(0, raadius + 40)
         
     pööre = 0
-    kiirus = 30
+    kiirus = 100000
 
     for _ in range(40):
         pööre += kiirus
@@ -52,7 +54,8 @@ def display_animation_casino():
         joonista_nool()
         update()
         sleep(0.05)
-        kiirus *= 0.93
+        kordaja = randint(100,1000)/1000
+        kiirus *= kordaja
 
     tracer(1)
 
@@ -130,8 +133,8 @@ except:
 
 if soovitud_raha <= konto:
     konto -= soovitud_raha
-    kiri(f"Võtsite {soovitud_raha} € välja!", -160)
-    kiri(f"Alles on {konto} €.", -190)
+    kiri(f"Võtsite {soovitud_raha} € välja!", -120)
+    kiri(f"Alles on {konto} €.", -320)
 
     raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
 
@@ -146,7 +149,30 @@ if soovitud_raha <= konto:
         p.goto(0, 0)
     else:
         konto_tekst.clear()
-        kiri("Olgu, ma jätan endale siis")
+        kiri("Pangaautomaat: Olgu, ma jätan endale siis", 30)
+        sleep(2)
+        kiri(nimi + ": Nooooo! Anna tagasi :(", 10)
+        sleep(2)
+        kiri("Pangaautomaat: Ei...", -10)
+        sleep(2)
+        kiri(nimi + ": Aga miks?", -30)
+        sleep(2)
+        kiri("Pangaautomaat: Sa oled ülbe neeger", -50)
+        sleep(2)
+        kiri(nimi + ": Ei mai ole >:(", -70)
+        sleep(2)
+        kiri("User20384: First lol", -90)
+        sleep(2)
+        kiri(nimi + ": Kes see ahv veel on?", -110)
+        sleep(2)
+        kiri("Pangaautomaat: Hold up, las ma bannin ta", -130)
+        sleep(2)
+        kiri("Server: User20384 got kick reason spamming ", -150)
+        sleep(2)
+        kiri(nimi + ": Anna mu " + str(soovitud_raha) + "€ ka tagasi nüüd", -170)
+        sleep(2)
+        kiri("Pangaautomaat: No okei, kuna su emme ütles", -190)
+        sleep(2)
 
 else:
     kiri("Kontol on liiga vähe raha!", -130)
@@ -187,7 +213,7 @@ else:
             p.penup()
             p.goto(0, 0)
     else:
-        kiri("Ole vaene rott edasi siis...", -160)
-
+        konto_tekst.clear()
+        kiri("Ole vaene rott edasi siis...", 20)
+        
 exitonclick()
-
