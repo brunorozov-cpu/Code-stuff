@@ -9,18 +9,17 @@ w, h = 500, 500
 tahvel = Canvas(raam, width=w, height=h)
 tahvel.pack()
 
-# --- Lae pilt (taust) ---
-# Kasuta PhotoImage ainult .gif või .png jaoks
+# Pilt 
 taust = PhotoImage(file="taust.png")
 
-# Lisa pilt keskele
+# Pilt kellal
 tahvel.create_image(w/2, h/2, image=taust)
 
-# --- Kella raam ja keskpunkt ---
+# Kella raam
 tahvel.create_oval(10, 10, w-10, h-10)
 tahvel.create_oval(w/2-5, h/2-5, w/2+5, h/2+5, fill="black")
 
-# --- Lisa numbrid ---
+# Numbrid
 r_numbrid = min(w/2, h/2) - 50
 for i in range(1, 13):
     nurk = pi/2 - i/12 * 2*pi
@@ -28,7 +27,7 @@ for i in range(1, 13):
     y = h/2 - r_numbrid * sin(nurk)
     tahvel.create_text(x, y, text=str(i), font=("Arial", 20, "bold"), fill="white")
 
-# --- Osutid ---
+# Osutid
 sek_id = tahvel.create_line(w/2, h/2, w/2, 20, fill="green", width=1)
 min_id = tahvel.create_line(w/2, h/2, w/2, 20, fill="yellow", width=3)
 tun_id = tahvel.create_line(w/2, h/2, w/2, 20, fill="red", width=5)
@@ -64,4 +63,5 @@ def uuenda():
 
 
 uuenda()
+
 raam.mainloop()
