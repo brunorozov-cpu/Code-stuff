@@ -22,6 +22,8 @@ def display_animation_casino():
     nurk = 360 / sektorid
     värvid = ["red", "black"] * (sektorid // 2)
 
+    
+
     def joonista_rulet(pööre):
         laud.clear()
 
@@ -97,6 +99,14 @@ kood1 = textinput("PIN-sisestus", "Loo endale PIN-1:")
 kood2 = textinput("PIN-sisestus", "Loo endale PIN-2:")
 konto_tekst.clear()
 
+def neeger(sõnum, y_offset=0, viivitus=0.03):
+        tekst = ""
+        for täht in sõnum:
+            tekst += täht
+            konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
+            konto_tekst.write(tekst, font=("Courier", 14, "normal"))
+            sleep(viivitus)
+
 # PIN-kontroll 3 katsega
 katseid = 3
 while katseid > 0:
@@ -135,9 +145,9 @@ if soovitud_raha <= konto:
     konto -= soovitud_raha
     kiri(f"Võtsite {soovitud_raha} € välja!", -120)
     kiri(f"Alles on {konto} €.", -320)
-
+        
     raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
-
+        
     if (raha):
         screen = getscreen()
         screen.addshape("raha.gif")
@@ -147,33 +157,40 @@ if soovitud_raha <= konto:
         p.shapesize(0.5, 0.5)
         p.penup()
         p.goto(0, 0)
+       
     else:
         konto_tekst.clear()
+        ban = nimi + " has been givin " + str(soovitud_raha) + "€" + " for good behavior"
         kiri("Pangaautomaat: Olgu, ma jätan endale siis", 30)
         sleep(2)
         kiri(nimi + ": Nooooo! Anna tagasi :(", 10)
-        sleep(2)
+        sleep(1)
         kiri("Pangaautomaat: Ei...", -10)
         sleep(2)
         kiri(nimi + ": Aga miks?", -30)
         sleep(2)
         kiri("Pangaautomaat: Sa oled ülbe neeger", -50)
-        sleep(2)
+        sleep(1.5)
         kiri(nimi + ": Ei mai ole >:(", -70)
-        sleep(2)
+        sleep(0.5)
         kiri("User20384: First lol", -90)
-        sleep(2)
+        sleep(1.5)
         kiri(nimi + ": Kes see ahv veel on?", -110)
         sleep(2)
         kiri("Pangaautomaat: Hold up, las ma bannin ta", -130)
-        sleep(2)
+        sleep(1.75)
         kiri("Server: User20384 got kick reason spamming ", -150)
         sleep(2)
         kiri(nimi + ": Anna mu " + str(soovitud_raha) + "€ ka tagasi nüüd", -170)
-        sleep(2)
+        sleep(1.75)
         kiri("Pangaautomaat: No okei, kuna su emme ütles", -190)
         sleep(2)
-
+        neeger("Server: " + ban, -210)
+        sleep(1)
+        kiri(nimi + ": Yay! thank you mommy", -230)
+        sleep(1.5)
+        kiri("Pangaautomaat: Edaspidi oled tubli poiss, eks?", -250)
+        
 else:
     kiri("Kontol on liiga vähe raha!", -130)
 
