@@ -122,7 +122,7 @@ def vali(num):
         pen.write("✅ ÕIGE! +500 €", align="center", font=("Arial", 18, "bold"))
     else:
         raha -= 500
-        pen.write(f"❌ VALE! Õige vastus oli {voor['õige']} (-300 €)", align="center", font=("Arial", 18, "bold"))
+        pen.write(f"❌ VALE! Õige vastus oli {voor['õige']} (-500 €)", align="center", font=("Arial", 18, "bold"))
 
     current_index += 1
     screen.ontimer(joonista_voor, 1000)
