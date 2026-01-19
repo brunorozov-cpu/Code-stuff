@@ -1,0 +1,133 @@
+import csv
+import turtle
+import random
+
+
+def loe_kysimused(failinimi):
+    voorud = []
+    with open(failinimi, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        read = list(reader)
+        random.shuffle(read)
+        for i in range(0, len(read) - 1, 2):
+            firma1 = read[i]
+            firma2 = read[i + 1]
+            try:
+                firmad = [firma1["nimi"], firma2["nimi"]]
+                random.shuffle(firmad)  # segame järjekorra
+
+                voor = {
+                    "vihje": f"Milline firma on tuntud {firma1['kitsas_tegevus']} valdkonnas?",
+                    "õige": firma1["nimi"], 
+                    "firmad": firmad,
+                    "stat": {
+                        firma1["nimi"]: {
+                            "käive": float(firma1["Kaive"]) if firma1["Kaive"] else 0,
+                            "töötajad": float(firma1["Tootajaid"]) if firma1["Tootajaid"] else 0
+                        },
+                        firma2["nimi"]: {
+                            "käive": float(firma2["Kaive"]) if firma2["Kaive"] else 0,
+                            "töötajad": float(firma2["Tootajaid"]) if firma2["Tootajaid"] else 0
+                        }
+                    }
+                }
+                voorud.append(voor)
+            except Exception as e:
+                print(f"Viga rea töötlemisel: {firma1}, {firma2}\n{e}")
+    return voorud
+
+
+raha = 1000
+current_index = 0
+
+
+voorud = loe_kysimused("sample_3.csv")
+random.shuffle(voorud)
+
+
+screen = turtle.Screen()
+screen.setup(width=1000, height=700)
+screen.title("🇪🇪 Eesti Firmade Majandusmäng")
+screen.bgcolor("white")
+
+pen = turtle.Turtle()
+pen.hideturtle()
+pen.penup()
+pen.speed(0)
+pen.color("black")
+
+kast_laius = 300
+kast_korgus = 150
+kast_y = 50 
+
+def joonista_voor():
+    global current_index, raha
+    pen.clear()
+
+    if current_index >= len(voorud):
+        pen.goto(0, 0)
+        pen.write(f"Mäng läbi! 💰 Raha kokku: {raha} €",
+                  align="center", font=("Arial", 24, "bold"))
+        return
+
+    voor = voorud[current_index]
+
+    pen.goto(0, 280)
+    pen.write(f"💰 Raha: {raha} €", align="center", font=("Arial", 20, "bold"))
+
+    pen.goto(0, 230)
+    pen.write(f"💡 Vihje: {voor['vihje']}", align="center", font=("Arial", 16, "normal"))
+
+    def joonista_kast(x, y, firma, stat):
+        pen.goto(x - kast_laius/2, y + kast_korgus/2)
+        pen.pendown()
+        pen.fillcolor("#DDDDDD")
+        pen.begin_fill()
+        for _ in range(2):
+            pen.forward(kast_laius)
+            pen.right(90)
+            pen.forward(kast_korgus)
+            pen.right(90)
+        pen.end_fill()
+        pen.penup()
+        pen.goto(x, y + 20)
+        pen.write(f"{firma}", align="center", font=("Arial", 14, "bold"))
+        pen.goto(x, y - 10)
+        pen.write(f"Käive: {stat['käive']} €", align="center", font=("Arial", 12, "normal"))
+        pen.goto(x, y - 30)
+        pen.write(f"Töötajad: {stat['töötajad']}", align="center", font=("Arial", 12, "normal"))
+
+    joonista_kast(-200, kast_y, voor["firmad"][0], voor["stat"][voor["firmad"][0]])
+    joonista_kast(200, kast_y, voor["firmad"][1], voor["stat"][voor["firmad"][1]])
+
+def kliki(x, y):
+    global current_index, raha
+    if current_index >= len(voorud):
+        return
+    voor = voorud[current_index]
+    if -200 - kast_laius/2 < x < -200 + kast_laius/2 and kast_y - kast_korgus/2 < y < kast_y + kast_korgus/2:
+        vali(0)
+    elif 200 - kast_laius/2 < x < 200 + kast_laius/2 and kast_y - kast_korgus/2 < y < kast_y + kast_korgus/2:
+        vali(1)
+
+def vali(num):
+    global raha, current_index
+    voor = voorud[current_index]
+    valitud_firma = voor["firmad"][num]
+
+    pen.goto(0, -200)
+
+    if valitud_firma == voor["õige"]:
+        raha += 500
+        pen.write("✅ ÕIGE! +500 €", align="center", font=("Arial", 18, "bold"))
+    else:
+        raha -= 300
+        pen.write(f"❌ VALE! Õige vastus oli {voor['õige']} (-300 €)", align="center", font=("Arial", 18, "bold"))
+
+    current_index += 1
+    screen.ontimer(joonista_voor, 1000)
+
+screen.onclick(kliki)
+
+joonista_voor()
+screen.mainloop()
