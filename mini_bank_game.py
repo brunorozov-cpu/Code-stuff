@@ -91,6 +91,14 @@ teade.penup()
 teade.goto(-side/2 + 20, side/2 - 90)
 teade.color("black")
 
+def pede(sõnum, y_offset=0, viivitus=0.5):
+        tekst = ""
+        for täht in sõnum:
+            tekst += täht
+            konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
+            konto_tekst.write(tekst, font=("Courier", 14, "normal"))
+            sleep(viivitus)
+
 #Konto loomine
 kiri("Tere tulemast pangaautomaati!", 30) 
 kiri("Loo endale konto!")
@@ -106,6 +114,8 @@ def neeger(sõnum, y_offset=0, viivitus=0.03):
             konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
             konto_tekst.write(tekst, font=("Courier", 14, "normal"))
             sleep(viivitus)
+
+
 
 # PIN-kontroll 3 katsega
 katseid = 3
@@ -146,7 +156,7 @@ if soovitud_raha <= konto:
     kiri(f"Võtsite {soovitud_raha} € välja!", -120)
     kiri(f"Alles on {konto} €.", -320)
         
-    raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja?? (jah/ei)")
+    raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja? (jah/ei)")
         
     if (raha):
         screen = getscreen()
@@ -190,6 +200,19 @@ if soovitud_raha <= konto:
         kiri(nimi + ": Yay! thank you mommy", -230)
         sleep(1.5)
         kiri("Pangaautomaat: Edaspidi oled tubli poiss, eks?", -250)
+        sleep(1.75)
+        tubli_poiss = messagebox.askyesno("Tähtis küsimus", "Kas sa oled edaspidi tubli poiss? (Jah issi/Ei)")
+        konto_tekst.clear()
+
+        if (tubli_poiss):
+            kiri("Tublu poiss", 0)
+
+        else:
+            kiri("Pangaautomaat:", 30)
+            pede("...", 30)
+            kiri("Mida vittu sa ütlesid mulle?", 10)
+            kiri(nimi + ": Ma ei ole su issi🗣️💢💢", -10)
+
         
 else:
     kiri("Kontol on liiga vähe raha!", -130)
