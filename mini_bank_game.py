@@ -22,8 +22,6 @@ def display_animation_casino():
     nurk = 360 / sektorid
     värvid = ["red", "black"] * (sektorid // 2)
 
-    
-
     def joonista_rulet(pööre):
         laud.clear()
 
@@ -91,14 +89,6 @@ teade.penup()
 teade.goto(-side/2 + 20, side/2 - 90)
 teade.color("black")
 
-def pede(sõnum, y_offset=0, viivitus=0.5):
-        tekst = ""
-        for täht in sõnum:
-            tekst += täht
-            konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
-            konto_tekst.write(tekst, font=("Courier", 14, "normal"))
-            sleep(viivitus)
-
 #Konto loomine
 kiri("Tere tulemast pangaautomaati!", 30) 
 kiri("Loo endale konto!")
@@ -114,8 +104,6 @@ def neeger(sõnum, y_offset=0, viivitus=0.03):
             konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
             konto_tekst.write(tekst, font=("Courier", 14, "normal"))
             sleep(viivitus)
-
-
 
 # PIN-kontroll 3 katsega
 katseid = 3
@@ -197,7 +185,7 @@ if soovitud_raha <= konto:
         sleep(2)
         neeger("Server: " + ban, -210)
         sleep(1)
-        kiri(nimi + ": Yay! thank you mommy", -230)
+        kiri(nimi + ": Yay! Thank you mommy", -230)
         sleep(1.5)
         kiri("Pangaautomaat: Edaspidi oled tubli poiss, eks?", -250)
         sleep(1.75)
@@ -205,15 +193,61 @@ if soovitud_raha <= konto:
         konto_tekst.clear()
 
         if (tubli_poiss):
-            kiri("Tublu poiss", 0)
-
+            kiri("Pangaautomaat: Tublu poiss", 30)
+            sleep(1)
+            kiri("Pangaautomaat: Võta oma " + str(soovitud_raha) + "€", 10)
+            sleep(1.5)
+            kiri(nimi + ": Väga äge", -10)
+            sleep(1.5)
+            konto_tekst.clear()
+            screen = Screen()
+            screen.addshape("good.gif")
+            p = Turtle()
+            p.shape("good.gif")
+            p.resizemode("user")
+            p.penup()
+            p.goto(0, 0)
+            
         else:
-            kiri("Pangaautomaat:", 30)
-            pede("...", 30)
-            kiri("Mida vittu sa ütlesid mulle?", 10)
+            kiri("Pangaautomaat: ...", 30)
+            sleep(2)
+            kiri("Pangaautomaat: Mida vittu sa ütlesid mulle?", 10)
+            sleep(2.5)
             kiri(nimi + ": Ma ei ole su issi🗣️💢💢", -10)
+            sleep(1.75)
+            kiri("Pangaautomaat: Kuradi loll neeger", -30)
+            sleep(2)
+            kiri("Pangaautomaat: Saad banni!", -50)
+            sleep(0.75)
+            neeger(nimi + ": EIIIIIII!", -70)
+            sleep(1.75)
+            kiri("Server: " + nimi + " data has been stolen", -90)
+            sleep(0.25)
+            kiri("Server: " + nimi + " " + str(konto) + "€ has been taken away", -110)
+            sleep(0.25)
+            kiri("Server: " + nimi + " nudes has been leaked", -130)
+            sleep(0.25)
+            kiri(nimi + ": WHAT?", -150)
+            sleep(2)
+            kiri("Server: " + nimi + " home location has been leaked", -170)
+            sleep(0.25)
+            kiri("Server: 58.230461, 26.449073", -190)
+            sleep(0.25)
+            kiri("Server: " + str(soovitud_raha) + "€ Has been taken back", -210)
+            sleep(0.25)
+            kiri(nimi + ": DUDE NOOOOOOO!", -230)
+            sleep(2)
+            kiri("Pangaautomaat: Its over mees", -250)
+            sleep(3)
+            konto_tekst.clear()
+            screen = Screen()
+            screen.addshape("bad.gif")
+            p = Turtle()
+            p.shape("bad.gif")
+            p.resizemode("user")
+            p.penup()
+            p.goto(0, 0)
 
-        
 else:
     kiri("Kontol on liiga vähe raha!", -130)
 
