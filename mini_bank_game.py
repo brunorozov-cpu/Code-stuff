@@ -5,6 +5,7 @@ from tkinter import messagebox
 from time import sleep
 import sys
 import time
+import os
 
 #Roulette table
 def display_animation_casino():
@@ -89,13 +90,27 @@ teade.penup()
 teade.goto(-side/2 + 20, side/2 - 90)
 teade.color("black")
 
-#Konto loomine
-kiri("Tere tulemast pangaautomaati!", 30) 
-kiri("Loo endale konto!")
-nimi = textinput("Nime küsimine", "Palun sisesta om nimi:")
-kood1 = textinput("PIN-sisestus", "Loo endale PIN-1:")
-kood2 = textinput("PIN-sisestus", "Loo endale PIN-2:")
-konto_tekst.clear()
+def salvesta_konto():
+    with open("konto.txt", "w") as fail:
+        fail.write(nimi + "\n")
+        fail.write(kood1 + "\n")
+        fail.write(str(konto))
+
+kiri("Tere tulemast pangaautomaati!", 30)
+konto_olemas = messagebox.askyesno("Konto", "Kas teil on juba konto olemas?")
+
+if konto_olemas and os.path.exists("konto.txt"):
+    with open("konto.txt", "r") as fail:
+        nimi = fail.readline().strip()
+        kood1 = fail.readline().strip()
+        konto = int(fail.readline().strip())
+else:
+    konto_tekst.clear()
+    kiri("Loo endale konto!")
+    nimi = textinput("Nimi", "Sisesta nimi:")
+    kood1 = textinput("PIN", "Loo PIN:")
+    konto = 100
+    salvesta_konto()
 
 def neeger(sõnum, y_offset=0, viivitus=0.03):
         tekst = ""
@@ -109,11 +124,11 @@ def neeger(sõnum, y_offset=0, viivitus=0.03):
 katseid = 3
 while katseid > 0:
     kiri("Logige sisse pangaautomaati!")
+    nimi_sisestus = textinput("Nime sisestus", "Palun sisesta oma nimi:")
     pin1 = textinput("PIN-sisestus", "Palun sisesta PIN-1:")
-    pin2 = textinput("PIN-sisestus", "Palun sisesta PIN-2:")
     konto_tekst.clear()
     
-    if kood1 == pin1 and kood2 == pin2:
+    if kood1 == pin1 and nimi_sisestus == nimi:
         teade.clear()
         break
     else:
@@ -123,14 +138,13 @@ while katseid > 0:
             teade.write(f"Vale PIN! Jäänud on {katseid} katset.", font=("Courier", 14, "normal"))
         else:
             teade.write("Konto on lukustatud!", font=("Courier", 14, "normal"))
-            exitonclick(pin2, pin1)
+            exitonclick(pin1)
 
-# Kui PIN õige
-konto = 100
+konto_tekst.clear()
 kiri("Pangaautomaat", 20)
-kiri("Tere! " + nimi +"!", -20)
-kiri("Sisenesite kontosse!\n", -80)
-kiri("Teie kontol on " + str(konto) + " €.", -100)
+kiri(f"Tere, {nimi}!", -20)
+kiri(f"Teie kontol on {konto} €.", -60)
+
 
 jätka = True
 while jätka:
@@ -145,6 +159,7 @@ while jätka:
 if soovitud_raha <= konto:
     konto -= soovitud_raha
     konto_tekst.clear()
+    salvesta_konto()
     kiri(f"Võtsite {soovitud_raha} € välja!", 30)
     kiri(f"Alles on {konto} €.", -10)
         
@@ -203,7 +218,11 @@ if soovitud_raha <= konto:
             sleep(1.5)
             kiri(nimi + ": Väga äge", -10)
             sleep(1.5)
+
+            konto += int(soovitud_raha)
+            salvesta_konto()
             konto_tekst.clear()
+
             screen = Screen()
             screen.addshape("good.gif")
             p = Turtle()
@@ -211,6 +230,7 @@ if soovitud_raha <= konto:
             p.resizemode("user")
             p.penup()
             p.goto(0, 0)
+            
             
         else:
             kiri("Pangaautomaat: ...", 30)
@@ -243,6 +263,10 @@ if soovitud_raha <= konto:
             sleep(2)
             kiri("Pangaautomaat: Its over mees", -250)
             sleep(3)
+
+            konto -= int(soovitud_raha)
+            salvesta_konto()
+
             konto_tekst.clear()
             screen = Screen()
             screen.addshape("bad.gif")
@@ -257,10 +281,9 @@ else:
 
     casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
 
-    casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
-
     if casino:
         kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
+        bet = textinput("Kasiino", "Palju te soovite panustada?")
         konto_tekst.clear()
         try:
             kasutaja_valik = int(kasutaja_valik)
@@ -273,6 +296,7 @@ else:
         konto_tekst.clear()
         if kasutaja_valik == suvaline_arv:
             konto += 100
+            salvesta_konto()
             kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja 100€!", 20)
             kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -20)
             screen = getscreen()
@@ -284,7 +308,8 @@ else:
             p.penup()
             p.goto(0, 0)
         else:
-            konto = 0
+            konto -100
+            salvesta_konto()
             kiri("Sa kaotasid kogu oma raha :(", 20)
             screen = getscreen()
             screen.addshape("bob.gif")
