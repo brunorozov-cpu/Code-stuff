@@ -132,17 +132,21 @@ kiri("Tere! " + nimi +"!", -20)
 kiri("Sisenesite kontosse!\n", -80)
 kiri("Teie kontol on " + str(konto) + " €.", -100)
 
-soovitud_raha = textinput("Väljavõtt", "Palju soovite välja võtta?")
-try:
-    soovitud_raha = int(soovitud_raha)
-except:
-    kiri("Vale sisestus!", -130)
-    exitonclick()
+jätka = True
+while jätka:
+    soovitud_raha = textinput("Väljavõtt", "Palju soovite välja võtta?")
 
+    try:
+        soovitud_raha = int(soovitud_raha)
+        jätka = False
+    except:
+        kiri("See ei olnud arv!", -130)
+    
 if soovitud_raha <= konto:
     konto -= soovitud_raha
-    kiri(f"Võtsite {soovitud_raha} € välja!", -120)
-    kiri(f"Alles on {konto} €.", -320)
+    konto_tekst.clear()
+    kiri(f"Võtsite {soovitud_raha} € välja!", 30)
+    kiri(f"Alles on {konto} €.", -10)
         
     raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja? (jah/ei)")
         
@@ -253,6 +257,8 @@ else:
 
     casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
 
+    casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
+
     if casino:
         kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
         konto_tekst.clear()
@@ -262,7 +268,9 @@ else:
         except:
             kiri("Vale sisestus!", -190)
             exitonclick()
+
         suvaline_arv = randint(1, 2)
+        konto_tekst.clear()
         if kasutaja_valik == suvaline_arv:
             konto += 100
             kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja 100€!", 20)
