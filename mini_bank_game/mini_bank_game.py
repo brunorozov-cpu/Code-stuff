@@ -156,7 +156,7 @@ if konto_olemas:
 else:
     nimi = textinput("Nimi", "Valige endale kasutajanimi:")
     kood1 = textinput("PIN", "Valige 4-kohaline PIN:")
-    konto = 1000
+    konto = 100
     salvesta_konto(nimi, kood1, konto)
 
 konto_tekst.clear()
@@ -175,7 +175,7 @@ while jätka:
     except:
         kiri("See ei olnud arv!", -130)
     
-if soovitud_raha <= konto:
+if soovitud_raha > 0 and soovitud_raha <= konto:
     konto -= soovitud_raha
     konto_tekst.clear()
     salvesta_konto(nimi, kood1, konto)
@@ -239,7 +239,7 @@ if soovitud_raha <= konto:
             sleep(1.5)
 
             konto += int(soovitud_raha)
-            salvesta_konto()
+            salvesta_konto(nimi, kood1, konto)
             konto_tekst.clear()
 
             screen = Screen()
@@ -284,7 +284,7 @@ if soovitud_raha <= konto:
             sleep(3)
 
             konto -= int(soovitud_raha)
-            salvesta_konto()
+            salvesta_konto(nimi, kood1, konto)
 
             konto_tekst.clear()
             screen = Screen()
@@ -316,7 +316,7 @@ else:
         konto_tekst.clear()
         if kasutaja_valik == suvaline_arv:
             konto += bet
-            salvesta_konto()
+            salvesta_konto(nimi, kood1, konto)
             kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja " + str(bet) + "€", 20)
             kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -20)
             screen = getscreen()
@@ -327,9 +327,10 @@ else:
             p.shapesize(0.5, 0.5)
             p.penup()
             p.goto(0, 0)
+        
         else:
             konto -= bet
-            salvesta_konto()
+            salvesta_konto(nimi, kood1, konto)
             kiri("Sa kaotasid " + str(bet) + "€ :(", 20)
             screen = getscreen()
             screen.addshape("bob.gif")
