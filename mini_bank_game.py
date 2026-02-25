@@ -6,6 +6,7 @@ from time import sleep
 import sys
 import time
 import os
+import sqlite3
 
 #Roulette table
 def display_animation_casino():
@@ -78,40 +79,6 @@ konto_tekst = turtle.Turtle()
 konto_tekst.hideturtle()
 konto_tekst.penup()
 
-#Konto loomise kiri
-def kiri(sõnum, y_offset=0):
-    konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
-    konto_tekst.write(sõnum, font=("Courier", 14, "normal"))
-
-# Vale PIN code
-teade = Turtle()
-teade.hideturtle()
-teade.penup()
-teade.goto(-side/2 + 20, side/2 - 90)
-teade.color("black")
-
-def salvesta_konto():
-    with open("konto.txt", "w") as fail:
-        fail.write(nimi + "\n")
-        fail.write(kood1 + "\n")
-        fail.write(str(konto))
-
-kiri("Tere tulemast pangaautomaati!", 30)
-konto_olemas = messagebox.askyesno("Konto", "Kas teil on juba konto olemas?")
-
-if konto_olemas and os.path.exists("konto.txt"):
-    with open("konto.txt", "r") as fail:
-        nimi = fail.readline().strip()
-        kood1 = fail.readline().strip()
-        konto = int(fail.readline().strip())
-else:
-    konto_tekst.clear()
-    kiri("Loo endale konto!")
-    nimi = textinput("Nimi", "Sisesta nimi:")
-    kood1 = textinput("PIN", "Loo PIN:")
-    konto = 100
-    salvesta_konto()
-
 def neeger(sõnum, y_offset=0, viivitus=0.03):
         tekst = ""
         for täht in sõnum:
@@ -120,207 +87,281 @@ def neeger(sõnum, y_offset=0, viivitus=0.03):
             konto_tekst.write(tekst, font=("Courier", 14, "normal"))
             sleep(viivitus)
 
-# PIN-kontroll 3 katsega
-katseid = 3
-while katseid > 0:
-    kiri("Logige sisse pangaautomaati!")
-    nimi_sisestus = textinput("Nime sisestus", "Palun sisesta oma nimi:")
-    pin1 = textinput("PIN-sisestus", "Palun sisesta PIN-1:")
-    konto_tekst.clear()
-    
-    if kood1 == pin1 and nimi_sisestus == nimi:
-        teade.clear()
-        break
-    else:
-        katseid -= 1
-        teade.clear()  # <<<Kustutab eelmise teate
-        if katseid > 0:
-            teade.write(f"Vale PIN! Jäänud on {katseid} katset.", font=("Courier", 14, "normal"))
+def kiri(sõnum, y_offset=0):
+    konto_tekst.goto(-side/2 + 20, side/2 - 60 + y_offset)
+    konto_tekst.write(sõnum, font=("Courier", 14, "normal"))
+
+teade = Turtle()
+teade.hideturtle()
+teade.penup()
+teade.goto(-side/2 + 20, side/2 - 90)
+teade.color("black")
+
+conn = sqlite3.connect("pank.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS kasutajad (
+    nimi TEXT PRIMARY KEY,
+    pin TEXT,
+    saldo INTEGER
+)
+""")
+
+def salvesta_konto(nimi, kood1, konto):
+    cursor.execute("""
+    INSERT INTO kasutajad (nimi, pin, saldo)
+    VALUES (?, ?, ?)
+    ON CONFLICT(nimi) DO UPDATE SET
+        pin=excluded.pin,
+        saldo=excluded.saldo
+    """, (nimi, kood1, konto))
+
+    conn.commit()
+
+kiri("Tere tulemast pangaautomaati!", 30)
+
+kontinuu = True
+while kontinuu:
+    konto_olemas = messagebox.askyesno("Konto", "Kas teil on juba konto olemas?")
+
+    if konto_olemas:
+        nimi = textinput("Nimi", "Sisesta nimi:")
+
+        cursor.execute("SELECT * FROM kasutajad WHERE nimi = ?", (nimi,))
+        tulemus = cursor.fetchone()
+
+        if tulemus:
+            nimi, kood1, konto = tulemus
+
+            katsed = 3
+            sisse_logitud = False
+
+            while katsed > 0:
+                sisestatud_pin = textinput("PIN", "Sisesta PIN:")
+
+                if sisestatud_pin == kood1:
+                    kiri(f"Tere, {nimi}!", -20)
+                    kiri(f"Teie kontol on {konto} €.", -40)
+                    sisse_logitud = True
+                    break
+                else:
+                    katsed -= 1
+                    kiri(f"Vale PIN! Alles jäänud: {katsed}", -30)
+
+            if not sisse_logitud:
+                kiri("Konto lukustatud!", -50)
+                exitonclick()
+
         else:
-            teade.write("Konto on lukustatud!", font=("Courier", 14, "normal"))
-            exitonclick(pin1)
-
-konto_tekst.clear()
-kiri("Pangaautomaat", 20)
-kiri(f"Tere, {nimi}!", -20)
-kiri(f"Teie kontol on {konto} €.", -60)
-
-
-jätka = True
-while jätka:
-    soovitud_raha = textinput("Väljavõtt", "Palju soovite välja võtta?")
-
-    try:
-        soovitud_raha = int(soovitud_raha)
-        jätka = False
-    except:
-        kiri("See ei olnud arv!", -130)
-    
-if soovitud_raha <= konto:
-    konto -= soovitud_raha
-    konto_tekst.clear()
-    salvesta_konto()
-    kiri(f"Võtsite {soovitud_raha} € välja!", 30)
-    kiri(f"Alles on {konto} €.", -10)
-        
-    raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja? (jah/ei)")
-        
-    if (raha):
-        screen = getscreen()
-        screen.addshape("raha.gif")
-        p = Turtle()
-        p.shape("raha.gif")
-        p.resizemode("user")
-        p.shapesize(0.5, 0.5)
-        p.penup()
-        p.goto(0, 0)
-       
-    else:
-        konto_tekst.clear()
-        ban = nimi + " has been givin " + str(soovitud_raha) + "€" + " for good behavior"
-        kiri("Pangaautomaat: Olgu, ma jätan endale siis", 30)
-        sleep(2)
-        kiri(nimi + ": Nooooo! Anna tagasi :(", 10)
-        sleep(1)
-        kiri("Pangaautomaat: Ei...", -10)
-        sleep(2)
-        kiri(nimi + ": Aga miks?", -30)
-        sleep(2)
-        kiri("Pangaautomaat: Sa oled ülbe neeger", -50)
-        sleep(1.5)
-        kiri(nimi + ": Ei mai ole >:(", -70)
-        sleep(0.5)
-        kiri("User20384: First lol", -90)
-        sleep(1.5)
-        kiri(nimi + ": Kes see ahv veel on?", -110)
-        sleep(2)
-        kiri("Pangaautomaat: Hold up, las ma bannin ta", -130)
-        sleep(1.75)
-        kiri("Server: User20384 got kick reason spamming ", -150)
-        sleep(2)
-        kiri(nimi + ": Anna mu " + str(soovitud_raha) + "€ ka tagasi nüüd", -170)
-        sleep(1.75)
-        kiri("Pangaautomaat: No okei, kuna su emme ütles", -190)
-        sleep(2)
-        neeger("Server: " + ban, -210)
-        sleep(1)
-        kiri(nimi + ": Yay! Thank you mommy", -230)
-        sleep(1.5)
-        kiri("Pangaautomaat: Edaspidi oled tubli poiss, eks?", -250)
-        sleep(1.75)
-        tubli_poiss = messagebox.askyesno("Tähtis küsimus", "Kas sa oled edaspidi tubli poiss? (Jah issi/Ei)")
-        konto_tekst.clear()
-
-        if (tubli_poiss):
-            kiri("Pangaautomaat: Tublu poiss", 30)
-            sleep(1)
-            kiri("Pangaautomaat: Võta oma " + str(soovitud_raha) + "€", 10)
-            sleep(1.5)
-            kiri(nimi + ": Väga äge", -10)
-            sleep(1.5)
-
-            konto += int(soovitud_raha)
-            salvesta_konto()
-            konto_tekst.clear()
-
-            screen = Screen()
-            screen.addshape("good.gif")
-            p = Turtle()
-            p.shape("good.gif")
-            p.resizemode("user")
-            p.penup()
-            p.goto(0, 0)
-            
-            
-        else:
-            kiri("Pangaautomaat: ...", 30)
-            sleep(2)
-            kiri("Pangaautomaat: Mida vittu sa ütlesid mulle?", 10)
-            sleep(2.5)
-            kiri(nimi + ": Ma ei ole su issi🗣️💢💢", -10)
-            sleep(1.75)
-            kiri("Pangaautomaat: Kuradi loll neeger", -30)
-            sleep(2)
-            kiri("Pangaautomaat: Saad banni!", -50)
-            sleep(0.75)
-            neeger(nimi + ": EIIIIIII!", -70)
-            sleep(1.75)
-            kiri("Server: " + nimi + " data has been stolen", -90)
-            sleep(0.25)
-            kiri("Server: " + nimi + " " + str(konto) + "€ has been taken away", -110)
-            sleep(0.25)
-            kiri("Server: " + nimi + " nudes has been leaked", -130)
-            sleep(0.25)
-            kiri(nimi + ": WHAT?", -150)
-            sleep(2)
-            kiri("Server: " + nimi + " home location has been leaked", -170)
-            sleep(0.25)
-            kiri("Server: 58.230461, 26.449073", -190)
-            sleep(0.25)
-            kiri("Server: " + str(soovitud_raha) + "€ Has been taken back", -210)
-            sleep(0.25)
-            kiri(nimi + ": DUDE NOOOOOOO!", -230)
-            sleep(2)
-            kiri("Pangaautomaat: Its over mees", -250)
-            sleep(3)
-
-            konto -= int(soovitud_raha)
-            salvesta_konto()
-
-            konto_tekst.clear()
-            screen = Screen()
-            screen.addshape("bad.gif")
-            p = Turtle()
-            p.shape("bad.gif")
-            p.resizemode("user")
-            p.penup()
-            p.goto(0, 0)
-
-else:
-    kiri("Kontol on liiga vähe raha!", -130)
-
-    casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
-
-    if casino:
-        kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
-        bet = textinput("Kasiino", "Palju te soovite panustada?")
-        konto_tekst.clear()
-        try:
-            kasutaja_valik = int(kasutaja_valik)
-            display_animation_casino()
-        except:
-            kiri("Vale sisestus!", -190)
+            kiri("Kasutajat ei leitud!", -10)
             exitonclick()
 
-        suvaline_arv = randint(1, 2)
-        konto_tekst.clear()
-        if kasutaja_valik == suvaline_arv:
-            konto += 100
-            salvesta_konto()
-            kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja 100€!", 20)
-            kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -20)
-            screen = getscreen()
-            screen.addshape("lel.gif")
-            p = Turtle()
-            p.shape("lel.gif")
-            p.resizemode("user")
-            p.shapesize(0.5, 0.5)
-            p.penup()
-            p.goto(0, 0)
-        else:
-            konto -100
-            salvesta_konto()
-            kiri("Sa kaotasid kogu oma raha :(", 20)
-            screen = getscreen()
-            screen.addshape("bob.gif")
-            p = Turtle()
-            p.shape("bob.gif")
-            p.resizemode("user")
-            p.shapesize(0.5, 0.5)
-            p.penup()
-            p.goto(0, 0)
     else:
+        nimi = textinput("Nimi", "Valige endale kasutajanimi:")
+        kood1 = textinput("PIN", "Valige 4-kohaline PIN:")
+        konto = 100
+        salvesta_konto(nimi, kood1, konto)
+
         konto_tekst.clear()
-        kiri("Ole vaene rott edasi siis...", 20)
+        kiri("Pangaautomaat", 20)
+        kiri(f"Tere, {nimi}!", -20)
+        kiri(f"Teie kontol on {konto} €.", -60)
+
+
+    jätka = True
+    while jätka:
+        soovitud_raha = textinput("Väljavõtt", "Palju soovite välja võtta?")
+
+        try:
+            soovitud_raha = int(soovitud_raha)
+            jätka = False
+        except:
+            kiri("See ei olnud arv!", -130)
+    
+    if soovitud_raha > 0 and soovitud_raha <= konto:
+        konto -= soovitud_raha
+        konto_tekst.clear()
+        salvesta_konto(nimi, kood1, konto)
+        kiri(f"Võtsite {soovitud_raha} € välja!", 30)
+        kiri(f"Alles on {konto} €.", -10)
+        
+        raha = messagebox.askyesno("Küsimus", "Võta raha pangaautomaadist välja? (jah/ei)")
+        
+        if (raha):
+            screen = getscreen()
+            screen.addshape("raha.gif")
+            p = Turtle()
+            p.shape("raha.gif")
+            p.resizemode("user")
+            p.shapesize(0.5, 0.5)
+            p.penup()
+            p.goto(0, 0)
+            sleep(3)
+            konto_tekst.clear()
+            konto_tekst.hideturtle()
+       
+        else:
+            konto_tekst.clear()
+            ban = nimi + " has been givin " + str(soovitud_raha) + "€" + " for good behavior"
+            kiri("Pangaautomaat: Olgu, ma jätan endale siis", 30)
+            sleep(2)
+            kiri(nimi + ": Nooooo! Anna tagasi :(", 10)
+            sleep(1)
+            kiri("Pangaautomaat: Ei...", -10)
+            sleep(2)
+            kiri(nimi + ": Aga miks?", -30)
+            sleep(2)
+            kiri("Pangaautomaat: Sa oled ülbe neeger", -50)
+            sleep(1.5)
+            kiri(nimi + ": Ei mai ole >:(", -70)
+            sleep(0.5)
+            kiri("User20384: First lol", -90)
+            sleep(1.5)
+            kiri(nimi + ": Kes see ahv veel on?", -110)
+            sleep(2)
+            kiri("Pangaautomaat: Hold up, las ma bannin ta", -130)
+            sleep(1.75)
+            kiri("Server: User20384 got kick reason spamming ", -150)
+            sleep(2)
+            kiri(nimi + ": Anna mu " + str(soovitud_raha) + "€ ka tagasi nüüd", -170)
+            sleep(1.75)
+            kiri("Pangaautomaat: No okei, kuna su emme ütles", -190)
+            sleep(2)
+            neeger("Server: " + ban, -210)
+            sleep(1)
+            kiri(nimi + ": Yay! Thank you mommy", -230)
+            sleep(1.5)
+            kiri("Pangaautomaat: Edaspidi oled tubli poiss, eks?", -250)
+            sleep(1.75)
+            tubli_poiss = messagebox.askyesno("Tähtis küsimus", "Kas sa oled edaspidi tubli poiss? (Jah issi/Ei)")
+            konto_tekst.clear()
+
+            if (tubli_poiss):
+                kiri("Pangaautomaat: Tublu poiss", 30)
+                sleep(1)
+                kiri("Pangaautomaat: Võta oma " + str(soovitud_raha) + "€", 10)
+                sleep(1.5)
+                kiri(nimi + ": Väga äge", -10)
+                sleep(1.5)
+
+                konto += int(soovitud_raha)
+                salvesta_konto(nimi, kood1, konto)
+                konto_tekst.clear()
+
+                screen = Screen()
+                screen.addshape("good.gif")
+                p = Turtle()
+                p.shape("good.gif")
+                p.resizemode("user")
+                p.penup()
+                p.goto(0, 0)
+                
+                
+            else:
+                kiri("Pangaautomaat: ...", 30)
+                sleep(2)
+                kiri("Pangaautomaat: Mida vittu sa ütlesid mulle?", 10)
+                sleep(2.5)
+                kiri(nimi + ": Ma ei ole su issi🗣️💢💢", -10)
+                sleep(1.75)
+                kiri("Pangaautomaat: Kuradi loll neeger", -30)
+                sleep(2)
+                kiri("Pangaautomaat: Saad banni!", -50)
+                sleep(0.75)
+                neeger(nimi + ": EIIIIIII!", -70)
+                sleep(1.75)
+                kiri("Server: " + nimi + " data has been stolen", -90)
+                sleep(0.25)
+                kiri("Server: " + nimi + " " + str(konto) + "€ has been taken away", -110)
+                sleep(0.25)
+                kiri("Server: " + nimi + " nudes has been leaked", -130)
+                sleep(0.25)
+                kiri(nimi + ": WHAT?", -150)
+                sleep(2)
+                kiri("Server: " + nimi + " home location has been leaked", -170)
+                sleep(0.25)
+                kiri("Server: 58.230461, 26.449073", -190)
+                sleep(0.25)
+                kiri("Server: " + str(soovitud_raha) + "€ Has been taken back", -210)
+                sleep(0.25)
+                kiri(nimi + ": DUDE NOOOOOOO!", -230)
+                sleep(2)
+                kiri("Pangaautomaat: Its over mees", -250)
+                sleep(3)
+
+                konto -= int(soovitud_raha)
+                salvesta_konto(nimi, kood1, konto)
+
+                konto_tekst.clear()
+                screen = Screen()
+                screen.addshape("bad.gif")
+                p = Turtle()
+                p.shape("bad.gif")
+                p.resizemode("user")
+                p.penup()
+                p.goto(0, 0)
+
+    else:
+        kiri("Kontol on liiga vähe raha!", -130)
+
+        casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
+
+        if casino:
+            kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
+            bet_input = int(textinput("Kasiino", "Palju te soovite panustada?"))
+            konto_tekst.clear()
+            try:
+                kasutaja_valik = int(kasutaja_valik)
+                bet = int(bet_input)
+                display_animation_casino()
+            except:
+                kiri("Vale sisestus!", -190)
+                exitonclick()
+
+            suvaline_arv = randint(1, 2)
+            konto_tekst.clear()
+            if kasutaja_valik == suvaline_arv:
+                konto += bet
+                salvesta_konto(nimi, kood1, konto)
+                kiri(f"BIG WIN! Te võitsid Paksu Rihardi ja " + str(bet) + "€", 20)
+                kiri(f"Teie kontol on nüüd {konto}€ ja Paks Rihard.", -20)
+                screen = getscreen()
+                screen.addshape("lel.gif")
+                p = Turtle()
+                p.shape("lel.gif")
+                p.resizemode("user")
+                p.shapesize(0.5, 0.5)
+                p.penup()
+                p.goto(0, 0)
+                sleep(5)
+
+            else:
+                konto -= bet
+                salvesta_konto(nimi, kood1, konto)
+                kiri("Sa kaotasid " + str(bet) + "€ :(", 20)
+                screen = getscreen()
+                screen.addshape("bob.gif")
+                p = Turtle()
+                p.shape("bob.gif")
+                p.resizemode("user")
+                p.shapesize(0.5, 0.5)
+                p.penup()
+                p.goto(0, 0)
+        else:
+            konto_tekst.clear()
+            kiri("Ole vaene rott edasi siis...", 20)
+    
+    konto_tekst.hideturtle()
+    konto_tekst.clear()
+    kiri("Pangaautomaat", 20)
+    kiri(f"Tere, {nimi}!", -20)
+    kiri(f"Teie kontol on {konto} €.", -60)
+    
+    jätka_samm = messagebox.askyesno("Pangaautomaat", "Kas soovite teist tehingut teha?")
+    if not jätka_samm:
+        kontinuu = False
+    konto_tekst.clear()
+    konto_tekst.hideturtle()
         
 exitonclick()
