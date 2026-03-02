@@ -3,9 +3,6 @@ from turtle import *
 from random import randint
 from tkinter import messagebox
 from time import sleep
-import sys
-import time
-import os
 import sqlite3
 
 #Roulette table
@@ -296,6 +293,7 @@ while kontinuu:
                 kiri(nimi + ": DUDE NOOOOOOO!", -230)
                 sleep(2)
                 kiri("Pangaautomaat: Its over mees", -250)
+                sleep(2)
 
                 konto -= int(soovitud_raha)
                 salvesta_konto(nimi, kood1, konto)
@@ -361,14 +359,59 @@ while kontinuu:
                 p.penup()
                 p.goto(0, 0)
                 sleep(3)
+                # lisa video
                 p.clear()
                 p.hideturtle()
         else:
             konto_tekst.clear()
-            kiri("Ole vaene rott edasi siis...", 20)
-            sleep(3)
-            p.clear()
-            p.hideturtle()
+            sleep(1)
+            kiri("Pangaautomat: ...?", 30)
+            sleep(2)
+            kiri("Pangaautomaat: Kas sa tahad tööle minna?", 10)
+            sleep(2)
+            töö = messagebox.askyesno("Töötu kassa", "Soovite tööle minna?")
+
+            if töö == True:
+                konto_tekst.clear()
+                kiri("Sul on töö nüüd",30)
+                exitonclick()
+            else:
+                konto_tekst.clear()
+                sleep(1.5)
+                kiri("Pangaautomaat: päriselt v?", 30)
+                sleep(3)
+                kiri(nimi + ": Mida?",10)
+                sleep(2)
+                kiri("Pangaautomaat: Ma ütlen emmele", -10)
+                sleep(1)
+                kiri(nimi + ": EIIIIIII!", -30)
+                sleep(3)
+                kiri("Su ema: Mis see sitt on mis ma kuulen?", -50)
+                sleep(1.5)
+                kiri("Su ema: Et minu laps ei taha tööle minna", -70)
+                sleep(2)
+                kiri(nimi + ": Aga emme...", -90)
+                sleep(1.5)
+                kiri("Su ema: VAIT! " + nimi + "!", -110)
+                sleep(1.75)
+                kiri("Su ema: Sa lähed pessu", -130)
+                sleep(1.5)
+                kiri(nimi + ": EIIIIIIIII!!!!!!!!!!", -150)
+                sleep(1.75)
+                konto_tekst.clear()
+
+                kiri("Sa läksid pessu", 30)
+                screen = getscreen()
+                screen.addshape("shower.gif")
+                p = Turtle()
+                p.shape("shower.gif")
+                p.resizemode("user")
+                p.shapesize(0.5, 0.5)
+                p.penup()
+                p.goto(0, 0)
+                sleep(3)
+                p.clear()
+                p.hideturtle()
 
     konto_tekst.hideturtle()
     konto_tekst.clear()
