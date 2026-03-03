@@ -374,6 +374,11 @@ while kontinuu:
             if töö == True:
                 konto_tekst.clear()
                 kiri("Sul on töö nüüd",30)
+                sleep(2)
+                import mcdonalds_vaade
+                from turtle import *
+                mcdonalds_vaade
+                
                 exitonclick()
             else:
                 konto_tekst.clear()
