@@ -313,7 +313,7 @@ while kontinuu:
     else:
         kiri("Kontol on liiga vähe raha!", -130)
 
-        casino = messagebox.askyesno("Kasiino", "Kas soovite teenida raha juurde?")
+        casino = messagebox.askyesno("Kasiino", "Kas soovite Casinose minna?")
 
         if casino:
             kasutaja_valik = textinput("Kasiino", "Red (1) või Black (2)?")
